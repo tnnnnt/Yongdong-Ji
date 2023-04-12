@@ -6,7 +6,6 @@ item::item(QWidget *parent)
 item::item(QString cont,QWidget *parent)
     : QWidget{parent}
 {
-    ttt=60000;
     run_icon=":/images/start.png";
     //定义线程的东西
     timer = new QTimer();
@@ -52,7 +51,7 @@ item::item(QString cont,QWidget *parent)
     this->setLayout(qhb);
     this->setMinimumSize(180,64);
     this->setMaximumSize(1864,64);
-    //启动事件
+    //启动及暂停事件
     connect(run,&QPushButton::clicked,[=](){
         if(run_icon==start_icon){
             run_icon=stop_icon;
@@ -61,7 +60,7 @@ item::item(QString cont,QWidget *parent)
             timer->start(ttt*minute);
         }else{
             run_icon=start_icon;
-            //暂停线程
+            //停止线程
             timer->stop();
             thread->quit();
             thread->wait();
@@ -74,7 +73,8 @@ item::item(QString cont,QWidget *parent)
         e->setWindowTitle("编辑提醒");
         e->cont->setText(content);
         e->ans->setText(answer);
-        e->sb_min->setValue(minute);
+        e->w_min->s->setValue(minute);
+        e->w_min->sb->setValue(minute);
         //确认事件
         connect(e->btn_sure,&QPushButton::clicked,[=](){
             QString new_cont=e->cont->toPlainText();
@@ -82,7 +82,7 @@ item::item(QString cont,QWidget *parent)
                 QMessageBox::critical(e,"错误！","请输入内容！");
             }else if(new_cont==content){
                 answer=e->ans->toPlainText();
-                minute=e->sb_min->value();
+                minute=e->w_min->s->value();
                 QJsonObject obj2;
                 obj2["answer"]=answer;
                 obj2["minute"]=minute;
@@ -100,13 +100,10 @@ item::item(QString cont,QWidget *parent)
                 cont_item[new_cont]=cont_item[content];
                 cont_item.remove(content);
                 PublicData::obj.remove(content);
-
                 content=new_cont;
                 answer=e->ans->toPlainText();
-                minute=e->sb_min->value();
-
+                minute=e->w_min->s->value();
                 ed->setText(content);
-
                 QJsonObject obj2;
                 obj2["answer"]=answer;
                 obj2["minute"]=minute;
@@ -124,6 +121,55 @@ item::item(QString cont,QWidget *parent)
     });
     //删除事件
     connect(del,&QPushButton::clicked,[=](){
+        if(PublicData::del_tip==0||QMessageBox::Yes  ==  QMessageBox::question(this,"删除确认","您真的要删除吗？无法恢复哦~",QMessageBox::Yes|QMessageBox::No,QMessageBox::No)){
+            //更改json
+            PublicData::obj.remove(content);
+            PublicData::qjd.setObject(PublicData::obj);
+            PublicData::data=PublicData::qjd.toJson();
+            QFile out(PublicData::file);
+            out.open(QIODevice::WriteOnly);
+            out.write(PublicData::data);
+            out.close();
+            //删除该组件
+            cont_item.remove(content);
+            delete this;
+        }
+    });
+}
+QMap<QString,item*>item::cont_item;
+QString item::start_icon=":/images/start.png";
+QString item::stop_icon=":/images/stop.png";
+int item::ttt=1000;//单位为毫秒，通常为60000，即1分钟，其他值为方便测试
+void item::showProcess(){
+    Timeset *w_min=new Timeset("间隔分钟数",PublicData::max_min,minute);
+    QPushButton *btn_con=new QPushButton("继续");
+    QPushButton *btn_stop=new QPushButton("停止");
+    QPushButton *btn_del=new QPushButton("删除");
+    QHBoxLayout *hbl=new QHBoxLayout();
+    QWidget *w_btn=new QWidget();
+    QTextBrowser *tb=new QTextBrowser();
+    QVBoxLayout *vbl=new QVBoxLayout();
+    QDialog *w=new QDialog();
+    tb->setPlainText(content);
+    hbl->addWidget(btn_con);
+    hbl->addWidget(btn_stop);
+    hbl->addWidget(btn_del);
+    w_btn->setLayout(hbl);
+    vbl->addWidget(tb);
+    vbl->addWidget(w_min);
+    vbl->addWidget(w_btn);
+    w->setLayout(vbl);
+    w->setWindowIcon(QIcon(PublicData::icon_path));
+    connect(btn_stop,&QPushButton::clicked,[=](){
+        run_icon=start_icon;
+        run->setIcon(QIcon(run_icon));
+        changeMin(w_min->s->value());
+        w->close();
+        //停止线程
+        thread->quit();
+        thread->wait();
+    });
+    connect(btn_del,&QPushButton::clicked,[=](){
         //更改json
         PublicData::obj.remove(content);
         PublicData::qjd.setObject(PublicData::obj);
@@ -134,37 +180,26 @@ item::item(QString cont,QWidget *parent)
         out.close();
         //删除该组件
         cont_item.remove(content);
+        w->close();
         delete this;
     });
-}
-QMap<QString,item*>item::cont_item;
-QString item::start_icon=":/images/start.png";
-QString item::stop_icon=":/images/stop.png";
-void item::showProcess(){
-    QDialog *w=new QDialog();
-    QVBoxLayout *vbl=new QVBoxLayout();
-    QTextBrowser *tb=new QTextBrowser();
-    QPushButton *btn=new QPushButton("好！");
-    tb->setPlainText(content);
-    vbl->addWidget(tb);
-    vbl->addWidget(btn);
-    w->setLayout(vbl);
-    w->setWindowIcon(QIcon(PublicData::icon_path));
     if(answer==""){
         //无answer（【继续/暂停】）
         w->setWindowTitle("Tip");
-        connect(btn,&QPushButton::clicked,[=](){
+        connect(btn_con,&QPushButton::clicked,[=](){
+            changeMin(w_min->s->value());
             timer->start(ttt*minute);
             w->close();
         });
     }else{
         //有answer（【继续】->【继续/暂停】）
         w->setWindowTitle("问题");
-        connect(btn,&QPushButton::clicked,[=](){
+        connect(btn_con,&QPushButton::clicked,[=](){
             if(w->windowTitle()=="问题"){
                 w->setWindowTitle("答案");
                 tb->setPlainText(answer);
             }else{
+                changeMin(w_min->s->value());
                 timer->start(ttt*minute);
                 w->close();
             }
@@ -172,4 +207,19 @@ void item::showProcess(){
     }
     w->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
     w->exec();
+}
+void item::changeMin(int m){
+    if(minute!=m){
+        minute=m;
+        QJsonObject obj2;
+        obj2["answer"]=answer;
+        obj2["minute"]=minute;
+        PublicData::obj[content]=obj2;
+        PublicData::qjd.setObject(PublicData::obj);
+        PublicData::data=PublicData::qjd.toJson();
+        QFile out(PublicData::file);
+        out.open(QIODevice::WriteOnly);
+        out.write(PublicData::data);
+        out.close();
+    }
 }

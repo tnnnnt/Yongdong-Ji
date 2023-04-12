@@ -2,7 +2,8 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include <Edit.h>
+#include <edit.h>
+#include <setting.h>
 #include <QMenu>
 #include <QSystemTrayIcon>  //t托盘类
 #include <QFile>
@@ -10,6 +11,7 @@
 #include <item.h>
 #include <QPushButton>
 #include <QMessageBox>
+#include <QTextStream>
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
 QT_END_NAMESPACE
@@ -24,6 +26,7 @@ private:
     QAction* newAction;
     QAction* quitAction;
     Edit *e;
+    Setting *st;
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();

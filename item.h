@@ -11,8 +11,8 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QMessageBox>
-#include <Work.h>
 #include <QTextBrowser>
+#include <QLabel>
 
 class item : public QWidget
 {
@@ -33,9 +33,10 @@ public:
     QTimer *timer;
     QThread *thread;
     Work *work;
-    int ttt;
+    static int ttt;
     explicit item(QWidget *parent = nullptr);
     item(QString content,QWidget *parent = nullptr);
+    void changeMin(int m);
 public slots:
     void showProcess();
 };

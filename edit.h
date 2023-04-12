@@ -10,6 +10,8 @@
 #include <QTextEdit>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QSlider>
+#include "timeset.h"
 
 class Edit : public QDialog
 {
@@ -17,18 +19,11 @@ class Edit : public QDialog
 
 public:
     QVBoxLayout *vbl;
-    QHBoxLayout *hbl0;
-    QHBoxLayout *hbl1;
+    QHBoxLayout *hbl;
     QTextEdit *cont;
     QTextEdit *ans;
-    QWidget *w_min;
+    Timeset *w_min;
     QWidget *w_sure;
-    QLabel *l_min;
-    QSpinBox *sb_min;
-    QSpacerItem *si0;
-    QSpacerItem *si1;
-    QSpacerItem *si2;
-    QSpacerItem *si3;
     QPushButton *btn_sure;
     QPushButton *btn_ret;
     explicit Edit(QWidget *parent = nullptr);

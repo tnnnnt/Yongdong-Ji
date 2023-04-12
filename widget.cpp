@@ -9,6 +9,25 @@ Widget::Widget(QWidget *parent)
     ui->setupUi(this);
     this->setWindowIcon(QIcon(QPixmap(PublicData::icon_path)));
     this->setWindowTitle(PublicData::title);
+    //读取max_min数据
+    QFile in_min(PublicData::file_max_min);
+    in_min.open(QIODevice::ReadOnly);
+    QTextStream in_ts_min(&in_min);
+    in_ts_min>>PublicData::max_min;
+    in_min.close();
+    //读取del_tip数据
+    QFile in_del_tip(PublicData::file_del_tip);
+    in_del_tip.open(QIODevice::ReadOnly);
+    QTextStream in_ts_del_tip(&in_del_tip);
+    in_ts_del_tip>>PublicData::del_tip;
+    in_del_tip.close();
+    //读取new_autorun数据
+    QFile in_new_autorun(PublicData::file_new_autorun);
+    in_new_autorun.open(QIODevice::ReadOnly);
+    QTextStream in_ts_new_autorun(&in_new_autorun);
+    in_ts_new_autorun>>PublicData::new_autorun;
+    in_new_autorun.close();
+    //
     QFile in(PublicData::file);
     in.open(QIODevice::ReadOnly);
     PublicData::data=in.readAll();
@@ -29,6 +48,10 @@ Widget::Widget(QWidget *parent)
     //添加事件
     connect(ui->btn_add,&QPushButton::clicked,[=](){
         additem();
+    });
+    //设置事件
+    connect(ui->btn_setting,&QPushButton::clicked,[=](){
+        st=new Setting();
     });
 
     //***托盘***
@@ -82,7 +105,7 @@ void Widget::additem(){
         }else{
             item::cont_item[new_cont]=new item(new_cont);
             item::cont_item[new_cont]->answer=e->ans->toPlainText();
-            item::cont_item[new_cont]->minute=e->sb_min->value();
+            item::cont_item[new_cont]->minute=e->w_min->s->value();
             ui->vvv->addWidget(item::cont_item[new_cont]);
             QJsonObject obj2;
             obj2["answer"]=item::cont_item[new_cont]->answer;
@@ -94,6 +117,14 @@ void Widget::additem(){
             out.open(QIODevice::WriteOnly);
             out.write(PublicData::data);
             out.close();
+            //开启了新建时自动启动
+            if(PublicData::new_autorun==1){
+                item::cont_item[new_cont]->run_icon=item::stop_icon;
+                //启动线程
+                item::cont_item[new_cont]->thread->start();
+                item::cont_item[new_cont]->timer->start(item::ttt*item::cont_item[new_cont]->minute);
+                item::cont_item[new_cont]->run->setIcon(QIcon(item::cont_item[new_cont]->run_icon));
+            }
             e->close();
         }
     });

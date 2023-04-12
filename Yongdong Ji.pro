@@ -13,6 +13,8 @@ SOURCES += \
     item.cpp \
     main.cpp \
     publicdata.cpp \
+    setting.cpp \
+    timeset.cpp \
     widget.cpp \
     work.cpp
 
@@ -20,10 +22,13 @@ HEADERS += \
     edit.h \
     item.h \
     publicdata.h \
+    setting.h \
+    timeset.h \
     widget.h \
     work.h
 
 FORMS += \
+    setting.ui \
     widget.ui
 
 # Default rules for deployment.
