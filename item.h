@@ -37,6 +37,7 @@ public:
     explicit item(QWidget *parent = nullptr);
     item(QString content,QWidget *parent = nullptr);
     void changeMin(int m);
+    void delItem(QString s);
 public slots:
     void showProcess();
 };

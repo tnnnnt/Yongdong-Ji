@@ -83,37 +83,19 @@ item::item(QString cont,QWidget *parent)
             }else if(new_cont==content){
                 answer=e->ans->toPlainText();
                 minute=e->w_min->s->value();
-                QJsonObject obj2;
-                obj2["answer"]=answer;
-                obj2["minute"]=minute;
-                PublicData::obj[content]=obj2;
-                PublicData::qjd.setObject(PublicData::obj);
-                PublicData::data=PublicData::qjd.toJson();
-                QFile out(PublicData::file);
-                out.open(QIODevice::WriteOnly);
-                out.write(PublicData::data);
-                out.close();
+                PublicData::newOrEditItem(content,answer,minute);
                 e->close();
             }else if(cont_item.find(new_cont)!=cont_item.end()){
                 QMessageBox::critical(e,"错误！","该内容已存在！");
             }else{
                 cont_item[new_cont]=cont_item[content];
                 cont_item.remove(content);
-                PublicData::obj.remove(content);
+                PublicData::obj_data.remove(content);
                 content=new_cont;
                 answer=e->ans->toPlainText();
                 minute=e->w_min->s->value();
                 ed->setText(content);
-                QJsonObject obj2;
-                obj2["answer"]=answer;
-                obj2["minute"]=minute;
-                PublicData::obj[content]=obj2;
-                PublicData::qjd.setObject(PublicData::obj);
-                PublicData::data=PublicData::qjd.toJson();
-                QFile out(PublicData::file);
-                out.open(QIODevice::WriteOnly);
-                out.write(PublicData::data);
-                out.close();
+                PublicData::newOrEditItem(content,answer,minute);
                 e->close();
             }
         });
@@ -122,16 +104,7 @@ item::item(QString cont,QWidget *parent)
     //删除事件
     connect(del,&QPushButton::clicked,[=](){
         if(PublicData::del_tip==0||QMessageBox::Yes  ==  QMessageBox::question(this,"删除确认","您真的要删除吗？无法恢复哦~",QMessageBox::Yes|QMessageBox::No,QMessageBox::No)){
-            //更改json
-            PublicData::obj.remove(content);
-            PublicData::qjd.setObject(PublicData::obj);
-            PublicData::data=PublicData::qjd.toJson();
-            QFile out(PublicData::file);
-            out.open(QIODevice::WriteOnly);
-            out.write(PublicData::data);
-            out.close();
-            //删除该组件
-            cont_item.remove(content);
+            delItem(content);
             delete this;
         }
     });
@@ -170,16 +143,7 @@ void item::showProcess(){
         thread->wait();
     });
     connect(btn_del,&QPushButton::clicked,[=](){
-        //更改json
-        PublicData::obj.remove(content);
-        PublicData::qjd.setObject(PublicData::obj);
-        PublicData::data=PublicData::qjd.toJson();
-        QFile out(PublicData::file);
-        out.open(QIODevice::WriteOnly);
-        out.write(PublicData::data);
-        out.close();
-        //删除该组件
-        cont_item.remove(content);
+        delItem(content);
         w->close();
         delete this;
     });
@@ -211,15 +175,27 @@ void item::showProcess(){
 void item::changeMin(int m){
     if(minute!=m){
         minute=m;
-        QJsonObject obj2;
-        obj2["answer"]=answer;
-        obj2["minute"]=minute;
-        PublicData::obj[content]=obj2;
-        PublicData::qjd.setObject(PublicData::obj);
-        PublicData::data=PublicData::qjd.toJson();
-        QFile out(PublicData::file);
-        out.open(QIODevice::WriteOnly);
-        out.write(PublicData::data);
-        out.close();
+        QJsonObject obj_tmp;
+        obj_tmp["answer"]=answer;
+        obj_tmp["minute"]=minute;
+        PublicData::obj_data[content]=obj_tmp;
+        PublicData::qjd_data.setObject(PublicData::obj_data);
+        PublicData::byte_data=PublicData::qjd_data.toJson();
+        PublicData::file_data.open(QIODevice::WriteOnly);
+        PublicData::file_data.write(PublicData::byte_data);
+        PublicData::file_data.close();
     }
 }
+void item::delItem(QString s){
+    //更改json
+    PublicData::obj_data.remove(s);
+    PublicData::qjd_data.setObject(PublicData::obj_data);
+    PublicData::byte_data=PublicData::qjd_data.toJson();
+    PublicData::file_data.open(QIODevice::WriteOnly);
+    PublicData::file_data.write(PublicData::byte_data);
+    PublicData::file_data.close();
+    //删除该组件
+    cont_item.remove(s);
+}
+
+

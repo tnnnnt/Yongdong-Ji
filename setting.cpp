@@ -21,32 +21,25 @@ Setting::Setting(QWidget *parent) :
     if(PublicData::new_autorun==1)ui->cb_new_autorun->setCheckState(Qt::Checked);
     else ui->cb_new_autorun->setCheckState(Qt::Unchecked);
 
-
     //保存事件
     connect(ui->btn_sure,&QPushButton::clicked,[=](){
         //保存 最大间隔分
         PublicData::max_min=ui->sb_min->value();
-        QFile out_min(PublicData::file_max_min);
-        out_min.open(QIODevice::WriteOnly);
-        QTextStream out_ts_min(&out_min);
-        out_ts_min<<PublicData::max_min;
-        out_min.close();
+        PublicData::obj_setting["max_min"]=PublicData::max_min;
         //保存 删除确认
         if(ui->cb_del_tip->checkState()==Qt::Checked)PublicData::del_tip=1;
         else PublicData::del_tip=0;
-        QFile out_del_tip(PublicData::file_del_tip);
-        out_del_tip.open(QIODevice::WriteOnly);
-        QTextStream out_ts_del_tip(&out_del_tip);
-        out_ts_del_tip<<PublicData::del_tip;
-        out_del_tip.close();
+        PublicData::obj_setting["del_tip"]=PublicData::del_tip;
         //保存 新建时自动启动
         if(ui->cb_new_autorun->checkState()==Qt::Checked)PublicData::new_autorun=1;
         else PublicData::new_autorun=0;
-        QFile out_new_autorun(PublicData::file_new_autorun);
-        out_new_autorun.open(QIODevice::WriteOnly);
-        QTextStream out_ts_new_autorun(&out_new_autorun);
-        out_ts_new_autorun<<PublicData::new_autorun;
-        out_new_autorun.close();
+        PublicData::obj_setting["new_autorun"]=PublicData::new_autorun;
+
+        PublicData::qjd_setting.setObject(PublicData::obj_setting);
+        PublicData::byte_setting=PublicData::qjd_setting.toJson();
+        PublicData::file_setting.open(QIODevice::WriteOnly);
+        PublicData::file_setting.write(PublicData::byte_setting);
+        PublicData::file_setting.close();
         this->close();
     });
     //取消事件
@@ -56,7 +49,4 @@ Setting::Setting(QWidget *parent) :
     this->exec();
 }
 
-Setting::~Setting()
-{
-    delete ui;
-}
+Setting::~Setting(){delete ui;}
