@@ -6,7 +6,7 @@ Edit::Edit(QWidget *parent) :
     vbl=new QVBoxLayout();
     hbl=new QHBoxLayout();
     cont=new QTextEdit();
-//    cont->setFont(QFont("Microsoft YaHei",20));
+    cont->setFont(QFont("Microsoft YaHei",20));
     cont->setPlaceholderText("请在此处输入内容");
     ans=new QTextEdit();
     ans->setPlaceholderText("请在此处输入答复（选填）");
@@ -32,3 +32,4 @@ Edit::Edit(QWidget *parent) :
 }
 
 Edit::~Edit(){}
+//
