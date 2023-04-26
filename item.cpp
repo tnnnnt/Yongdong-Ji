@@ -112,7 +112,7 @@ item::item(QString cont,QWidget *parent)
 QMap<QString,item*>item::cont_item;
 QString item::start_icon=":/images/start.png";
 QString item::stop_icon=":/images/stop.png";
-int item::ttt=1000;//单位为毫秒，通常为60000，即1分钟，其他值为方便测试
+int item::ttt=60000;//单位为毫秒，通常为60000，即1分钟，其他值为方便测试
 void item::showProcess(){
     Timeset *w_min=new Timeset("间隔分钟数",PublicData::max_min,minute);
     QPushButton *btn_con=new QPushButton("继续");
