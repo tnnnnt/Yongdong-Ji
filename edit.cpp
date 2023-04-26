@@ -6,9 +6,10 @@ Edit::Edit(QWidget *parent) :
     vbl=new QVBoxLayout();
     hbl=new QHBoxLayout();
     cont=new QTextEdit();
-    cont->setFont(QFont("Microsoft YaHei",20));
-    cont->setPlaceholderText("请在此处输入内容");
     ans=new QTextEdit();
+    cont->setFont(PublicData::qf);
+    ans->setFont(PublicData::qf);
+    cont->setPlaceholderText("请在此处输入内容");
     ans->setPlaceholderText("请在此处输入答复（选填）");
     w_min=new Timeset("间隔分钟数",PublicData::max_min,1);
     w_sure=new QWidget();
@@ -32,4 +33,3 @@ Edit::Edit(QWidget *parent) :
 }
 
 Edit::~Edit(){}
-//

@@ -103,7 +103,7 @@ item::item(QString cont,QWidget *parent)
     });
     //删除事件
     connect(del,&QPushButton::clicked,[=](){
-        if(PublicData::del_tip==0||QMessageBox::Yes  ==  QMessageBox::question(this,"删除确认","您真的要删除吗？无法恢复哦~",QMessageBox::Yes|QMessageBox::No,QMessageBox::No)){
+        if(!PublicData::del_tip||QMessageBox::Yes  ==  QMessageBox::question(this,"删除确认","您真的要删除吗？无法恢复哦~",QMessageBox::Yes|QMessageBox::No,QMessageBox::No)){
             delItem(content);
             delete this;
         }
@@ -112,7 +112,7 @@ item::item(QString cont,QWidget *parent)
 QMap<QString,item*>item::cont_item;
 QString item::start_icon=":/images/start.png";
 QString item::stop_icon=":/images/stop.png";
-int item::ttt=60000;//单位为毫秒，通常为60000，即1分钟，其他值为方便测试
+int item::ttt=1000;//单位为毫秒，通常为60000，即1分钟，其他值为方便测试
 void item::showProcess(){
     Timeset *w_min=new Timeset("间隔分钟数",PublicData::max_min,minute);
     QPushButton *btn_con=new QPushButton("继续");
@@ -123,6 +123,8 @@ void item::showProcess(){
     QTextBrowser *tb=new QTextBrowser();
     QVBoxLayout *vbl=new QVBoxLayout();
     QDialog *w=new QDialog();
+
+    tb->setFont(PublicData::qf);
     tb->setPlainText(content);
     hbl->addWidget(btn_con);
     hbl->addWidget(btn_stop);

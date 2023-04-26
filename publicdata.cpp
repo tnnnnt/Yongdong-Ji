@@ -12,11 +12,18 @@ QJsonDocument PublicData::qjd_setting;
 QJsonObject PublicData::obj_setting;
 
 int PublicData::max_min=360;
-int PublicData::del_tip=1;
-int PublicData::new_autorun=1;
+bool PublicData::del_tip=true;
+bool PublicData::new_autorun=true;
+QString PublicData::family="SimSun";//字体
+int PublicData::pointsize=20;//字体像素大小
+bool PublicData::bold=false;
+bool PublicData::italic=false;
+bool PublicData::underline=false;
+QString PublicData::words;
 
 QString PublicData::icon_path=":/images/icon.jpg";
 QString PublicData::title="永动姬";
+QFont PublicData::qf=QFont();
 
 void PublicData::newOrEditItem(QString cont,QString ans,int min){
     QJsonObject obj_tmp;

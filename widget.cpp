@@ -17,8 +17,20 @@ Widget::Widget(QWidget *parent)
     PublicData::qjd_setting=QJsonDocument::fromJson(PublicData::byte_setting);
     PublicData::obj_setting=PublicData::qjd_setting.object();
     PublicData::max_min=PublicData::obj_setting["max_min"].toInt();
-    PublicData::del_tip=PublicData::obj_setting["del_tip"].toInt();
-    PublicData::new_autorun=PublicData::obj_setting["new_autorun"].toInt();
+    PublicData::del_tip=PublicData::obj_setting["del_tip"].toBool();
+    PublicData::new_autorun=PublicData::obj_setting["new_autorun"].toBool();
+    PublicData::family=PublicData::obj_setting["family"].toString();
+    PublicData::pointsize=PublicData::obj_setting["pointsize"].toInt();
+    PublicData::bold=PublicData::obj_setting["bold"].toBool();
+    PublicData::italic=PublicData::obj_setting["italic"].toBool();
+    PublicData::underline=PublicData::obj_setting["underline"].toBool();
+    PublicData::words=PublicData::obj_setting["words"].toString();
+    //字体
+    PublicData::qf.setFamily(PublicData::family);
+    PublicData::qf.setPointSize(PublicData::pointsize);
+    PublicData::qf.setBold(PublicData::bold);
+    PublicData::qf.setItalic(PublicData::italic);
+    PublicData::qf.setUnderline(PublicData::underline);
 
     //读取数据
     PublicData::file_data.open(QIODevice::ReadOnly);
@@ -101,7 +113,7 @@ void Widget::additem(){
             ui->vvv->addWidget(item::cont_item[new_cont]);
             PublicData::newOrEditItem(new_cont,item::cont_item[new_cont]->answer,item::cont_item[new_cont]->minute);
             //开启了新建时自动启动
-            if(PublicData::new_autorun==1){
+            if(PublicData::new_autorun){
                 item::cont_item[new_cont]->run_icon=item::stop_icon;
                 //启动线程
                 item::cont_item[new_cont]->thread->start();
