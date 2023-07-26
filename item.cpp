@@ -163,7 +163,7 @@ void item::showProcess(){
         connect(btn_con,&QPushButton::clicked,[=](){
             if(w->windowTitle()=="问题"){
                 w->setWindowTitle("答案");
-                tb->setPlainText(answer);
+                tb->setPlainText("问题: "+content+"\n====================\n"+answer);
             }else{
                 changeMin(w_min->s->value());
                 timer->start(ttt*minute);
